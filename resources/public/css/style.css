@@ -1,0 +1,71 @@
+.click {
+    cursor: pointer;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+.noselect {
+    -webkit-user-select: none; /* webkit (safari, chrome) browsers */
+    -moz-user-select: none; /* mozilla browsers */
+    -khtml-user-select: none; /* webkit (konqueror) browsers */
+    -ms-user-select: none; /* IE10+ */
+}
+
+div#scoreboard {
+    float: left;
+    height: 300px;
+    font-size: 24px;
+    font-weight: bold;
+    border: 1px solid #000;
+}
+
+div.home {
+    width: 150px;
+    margin: 20px;
+    float: left;
+    text-align: center;
+}
+
+div.keys {
+    float: left;
+    width: 200px;
+    margin-top: 20px;
+    margin-left: 20px;
+    text-align: center;
+}
+
+div.away {
+    width: 150px;
+    margin: 20px;
+    float: left;
+    text-align: center;
+}
+
+div.score {
+    font-size: 64px;
+    height: 80px;
+}
+
+div.teams {
+    height: 80px;
+    font-size: 24px;
+}
+
+div.down {
+    width: 70px;
+}
+
+div.bottom {
+    margin-left: 120px;
+    text-align: center;
+}
+
+div.bottom>div {
+    margin: 15px;
+}
