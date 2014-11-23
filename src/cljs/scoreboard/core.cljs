@@ -98,7 +98,7 @@
      <? (str "< " ydln)
      <> (str "< " ydln " >"))))
 
-(defn ball-on-editor [ball-on]
+(defn ball-on-editor [ball-on posession]
   (om/build number-editor ball-on
             {:fn (fn [ball-on]
                    {:path [:ball-on]
@@ -150,7 +150,7 @@
           (om/build team
                     (:home app)
                     {:fn #(assoc %
-                            :posession (= :home (:posession app)))})]
+                            :possession (= :home (:possession app)))})]
          [:div.keys
           [:div.teams
            [:div.left.click
@@ -162,21 +162,21 @@
              :on-context-menu (publish-event! ::dec-score {:home? false})}
             "Away"]]
           [:div.timeouts "TIMEOUTS"]
-          [:div.posession.click
+          [:div.possession.click
            {:on-click (fn [e]
                         (.preventDefault e)
-                        (e/publish! (e/event ::change-posession)))}
-           "POSESSION"]]
+                        (e/publish! (e/event ::change-possession)))}
+           "POSSESSION"]]
          [:div.away
           (om/build team
                     (:away app)
                     {:fn #(assoc %
-                            :posession (= :away (:posession app)))})]]
+                            :possession (= :away (:possession app)))})]]
         [:div.bottom
          [:div.left
           (down-editor (:down app))]
          [:div.left (to-go-editor (:to-go app))]
-         [:div.left (ball-on-editor (:ball-on app))]
+         [:div.left (ball-on-editor (:ball-on app) (:possession app))]
          [:div.left
           (qtr-editor (:qtr app))]]]))))
 
@@ -199,8 +199,8 @@
   (swap! app-state update-in [(if home? :home :away) :timeouts]
          #(if (zero? %) 3 (dec-0 %))))
 
-(defn change-posession [_]
-  (swap! app-state update-in [:posession] #(if (= :home %) :away :home)))
+(defn change-possession [_]
+  (swap! app-state update-in [:possession] #(if (= :home %) :away :home)))
 
 (defn inc-down [_]
   (swap! app-state update-in [:down]
@@ -238,7 +238,7 @@
    [::inc-score] inc-score
    [::dec-score] dec-score
    [::dec-timeout] dec-timeout
-   [::change-posession] change-posession
+   [::change-possession] change-possession
    [::edit-number] edit-number
    [::inc-number] inc-number
    [::dec-number] dec-number
