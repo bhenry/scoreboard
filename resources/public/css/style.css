@@ -21,7 +21,7 @@ body {
     -ms-user-select: none; /* IE10+ */
 }
 
-div:hover>.tooltip {
+:hover>.tooltip {
     display: block;
     opacity: 1;
 }
