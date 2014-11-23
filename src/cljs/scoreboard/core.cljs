@@ -1,5 +1,6 @@
 (ns scoreboard.core
   (:require [scoreboard.events :as e :refer [app-state]]
+            [scoreboard.instructions :as i]
             [om.core :as om :include-macros true]
             [clojure.string :refer [blank?]]
             [sablono.core :as html :refer-macros [html]]))
@@ -39,7 +40,8 @@
     om/IRenderState
     (render-state [_ {:keys [editing?]}]
       (let [event-info (select-keys cursor [:path :max :min])
-            {:keys [dom-id dom-label click-dec? display-fn number]} cursor
+            {:keys [dom-id dom-label click-dec? display-fn number
+                    label-tip number-tip]} cursor
             click (if click-dec? ::dec-number ::inc-number)
             right-click (if click-dec? ::inc-number ::dec-number)
             action-fn (fn [e]
@@ -56,7 +58,8 @@
           (when dom-label
             [:div.click {:on-click (publish-event! click event-info)
                          :on-context-menu (publish-event! right-click event-info)}
-             dom-label])
+             dom-label
+             label-tip])
           (if editing?
             [:div
              [:form {:on-submit action-fn}
@@ -64,15 +67,17 @@
                        :type "text"
                        :size 3
                        :on-blur action-fn}]]]
-            [:div {:on-click #(do (.preventDefault %)
-                                  (om/set-state! owner :editing? true))}
-             (if display-fn (display-fn number) number)])])))))
+            [:div.tipper {:on-click #(do (.preventDefault %)
+                                         (om/set-state! owner :editing? true))}
+             (if display-fn (display-fn number) number)
+             number-tip])])))))
 
 (defn score-editor [score home?]
   (om/build number-editor score
             {:fn (fn [n]
                    {:path [(if home? :home :away) :score]
                     :number n
+                    :number-tip i/score
                     :dom-id (if home? "homescore" "awayscore")})}))
 
 (defn team [team owner]
@@ -86,7 +91,8 @@
           [:div.timeouts.click
            {:on-click (publish-event! ::dec-timeout
                                       {:home? home?})}
-           timeouts]
+           timeouts
+           i/timeout]
           [:div.possession (if possession "X" "_")]])))))
 
 (defn- show-ball-on [y]
@@ -107,6 +113,8 @@
                     :number ball-on
                     :dom-id "ball-on"
                     :dom-label "ball on"
+                    :label-tip i/ball-on-label
+                    :number-tip i/ball-on-number
                     :click-dec? (= possession :away)
                     :max 100
                     :min 0
@@ -119,6 +127,8 @@
                     :number to-go
                     :dom-id "to-go"
                     :dom-label "to go"
+                    :label-tip i/to-go-label
+                    :number-tip i/to-go-number
                     :max 100
                     :display-fn #(if (zero? %) "in." %)})}))
 
@@ -129,6 +139,8 @@
                     :number down
                     :dom-id "down"
                     :dom-label "down"
+                    :label-tip i/down-label
+                    :number-tip i/down-number
                     :max 4
                     :min 1})}))
 
@@ -139,6 +151,8 @@
                     :number qtr
                     :dom-id "qtr"
                     :dom-label "qtr"
+                    :label-tip i/qtr-label
+                    :number-tip i/qtr-number
                     :max 4
                     :min 1})}))
 
@@ -159,17 +173,20 @@
            [:div.left.click
             {:on-click (publish-event! ::inc-score {:home? true})
              :on-context-menu (publish-event! ::dec-score {:home? true})}
-            "Home"]
+            "Home"
+            i/score-header]
            [:div.right.click
             {:on-click (publish-event! ::inc-score {:home? false})
              :on-context-menu (publish-event! ::dec-score {:home? false})}
-            "Away"]]
+            "Away"
+            i/score-header]]
           [:div.timeouts "TIMEOUTS"]
           [:div.possession.click
            {:on-click (fn [e]
                         (.preventDefault e)
                         (e/publish! (e/event ::change-possession)))}
-           "POSSESSION"]]
+           "POSSESSION"
+           i/possession]]
          [:div.away
           (om/build team
                     (:away app)

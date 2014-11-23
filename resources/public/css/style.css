@@ -21,6 +21,27 @@ body {
     -ms-user-select: none; /* IE10+ */
 }
 
+div:hover>.tooltip {
+    display: block;
+    opacity: 1;
+}
+
+.tooltip {
+    font-size: 16px;
+    display: none;
+    background: #9cf;
+    padding: 14px 28px 14px 10px;
+    margin: 12px;
+    position: absolute;
+    top: 320px;
+    left: 24px;
+    z-index: 1000;
+    text-align: left;
+    -webkit-transition: opacity 0.3s ease-out;
+    opacity: 0; 
+    overflow: hidden;
+}
+
 div#scoreboard {
     float: left;
     height: 300px;
