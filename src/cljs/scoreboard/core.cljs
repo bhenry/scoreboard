@@ -62,8 +62,8 @@
                        :type "text"
                        :size 3
                        :on-blur action-fn}]]]
-            [:div.click {:on-click #(do (.preventDefault %)
-                                        (om/set-state! owner :editing? true))}
+            [:div {:on-click #(do (.preventDefault %)
+                                  (om/set-state! owner :editing? true))}
              (if display-fn (display-fn number) number)])])))))
 
 (defn score-editor [score home?]
@@ -141,11 +141,13 @@
                             :posession (= :home (:posession app)))})]
          [:div.keys
           [:div.teams
-           [:div.left {:on-click (publish-event! ::inc-score {:home? true})
-                       :on-context-menu (publish-event! ::dec-score {:home? true})}
+           [:div.left.click
+            {:on-click (publish-event! ::inc-score {:home? true})
+             :on-context-menu (publish-event! ::dec-score {:home? true})}
             "Home"]
-           [:div.right {:on-click (publish-event! ::inc-score {:home? false})
-                        :on-context-menu (publish-event! ::dec-score {:home? false})}
+           [:div.right.click
+            {:on-click (publish-event! ::inc-score {:home? false})
+             :on-context-menu (publish-event! ::dec-score {:home? false})}
             "Away"]]
           [:div.timeouts "TIMEOUTS"]
           [:div.posession.click
