@@ -7,8 +7,7 @@
 
 (defonce init
   (reset! app-state
-          {:text "ScoreBoard+"
-           :home {:home? true
+          {:home {:home? true
                   :score 0
                   :timeouts 3}
            :away {:home? false
@@ -221,20 +220,6 @@
 
 (defn change-possession [_]
   (swap! app-state update-in [:possession] #(if (= :home %) :away :home)))
-
-(defn inc-down [_]
-  (swap! app-state update-in [:down]
-         #(if (= 4 %) 1 (inc %))))
-
-(defn inc-qtr [_]
-  (swap! app-state update-in [:qtr]
-         #(if (= 4 %) 1 (inc %))))
-
-(defn inc-to-go [_]
-  (swap! app-state update-in [:to-go] inc))
-
-(defn dec-to-go [_]
-  (swap! app-state update-in [:to-go] dec-0))
 
 (defn edit-number [{:keys [editor]}]
   (om/set-state! editor [:editing?] true))
