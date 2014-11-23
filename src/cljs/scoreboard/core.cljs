@@ -87,6 +87,17 @@
            timeouts]
           [:div.posession (if posession "X" "_")]])))))
 
+(defn- show-ball-on [y]
+  (let [>? (> y 50)
+        <? (< y 50)
+        <> (= y 50)
+        yd (if >? (- 100 y) y)
+        ydln (if (zero? yd) "G" yd)]
+    (cond
+     >? (str ydln " >")
+     <? (str "< " ydln)
+     <> (str "< " ydln " >"))))
+
 (defn ball-on-editor [ball-on]
   (om/build number-editor ball-on
             {:fn (fn [ball-on]
@@ -94,8 +105,9 @@
                     :number ball-on
                     :dom-id "ball-on"
                     :dom-label "ball on"
-                    :max 50
-                    :display-fn #(if (zero? %) "G" %)})}))
+                    :max 100
+                    :min 0
+                    :display-fn show-ball-on})}))
 
 (defn to-go-editor [to-go]
   (om/build number-editor to-go
