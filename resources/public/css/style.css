@@ -47,7 +47,7 @@ div.away {
     text-align: center;
 }
 
-div.score {
+div.homescore, div.awayscore {
     font-size: 64px;
     height: 80px;
 }
