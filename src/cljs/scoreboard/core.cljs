@@ -18,7 +18,7 @@
            :down 1
            :qtr 1
            :time "15:00"
-           :posession :home}))
+           :possession :home}))
 
 (defn publish-event! [t & [ev]]
   (fn [e]
@@ -39,7 +39,9 @@
     om/IRenderState
     (render-state [_ {:keys [editing?]}]
       (let [event-info (select-keys cursor [:path :max :min])
-            {:keys [dom-id dom-label display-fn number]} cursor
+            {:keys [dom-id dom-label click-dec? display-fn number]} cursor
+            click (if click-dec? ::dec-number ::inc-number)
+            right-click (if click-dec? ::inc-number ::dec-number)
             action-fn (fn [e]
                         (.preventDefault e)
                         (e/publish!
@@ -52,8 +54,8 @@
         (html
          [:div {:class dom-id}
           (when dom-label
-            [:div.click {:on-click (publish-event! ::inc-number event-info)
-                         :on-context-menu (publish-event! ::dec-number event-info)}
+            [:div.click {:on-click (publish-event! click event-info)
+                         :on-context-menu (publish-event! right-click event-info)}
              dom-label])
           (if editing?
             [:div
@@ -77,7 +79,7 @@
   (reify
     om/IRender
     (render [_]
-      (let [{:keys [home? score timeouts posession]} team]
+      (let [{:keys [home? score timeouts possession]} team]
         (html
          [:div.team
           (score-editor score home?)
@@ -85,7 +87,7 @@
            {:on-click (publish-event! ::dec-timeout
                                       {:home? home?})}
            timeouts]
-          [:div.posession (if posession "X" "_")]])))))
+          [:div.possession (if possession "X" "_")]])))))
 
 (defn- show-ball-on [y]
   (let [>? (> y 50)
@@ -98,13 +100,14 @@
      <? (str "< " ydln)
      <> (str "< " ydln " >"))))
 
-(defn ball-on-editor [ball-on posession]
+(defn ball-on-editor [ball-on possession]
   (om/build number-editor ball-on
             {:fn (fn [ball-on]
                    {:path [:ball-on]
                     :number ball-on
                     :dom-id "ball-on"
                     :dom-label "ball on"
+                    :click-dec? (= possession :away)
                     :max 100
                     :min 0
                     :display-fn show-ball-on})}))
