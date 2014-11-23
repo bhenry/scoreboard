@@ -1,6 +1,7 @@
 (ns scoreboard.core
   (:require [scoreboard.events :as e :refer [app-state]]
             [om.core :as om :include-macros true]
+            [clojure.string :refer [blank?]]
             [sablono.core :as html :refer-macros [html]]))
 
 (defonce init
@@ -65,16 +66,6 @@
                                         (om/set-state! owner :editing? true))}
              (if display-fn (display-fn number) number)])])))))
 
-(defn ball-on-editor [ball-on]
-  (om/build number-editor ball-on
-            {:fn (fn [ball-on]
-                   {:path [:ball-on]
-                    :number ball-on
-                    :dom-id "ball-on"
-                    :dom-label "ball on"
-                    :max 50
-                    :display-fn #(if (zero? %) "G" %)})}))
-
 (defn score-editor [score home?]
   (om/build number-editor score
             {:fn (fn [n]
@@ -95,6 +86,46 @@
                                       {:home? home?})}
            timeouts]
           [:div.posession (if posession "X" "_")]])))))
+
+(defn ball-on-editor [ball-on]
+  (om/build number-editor ball-on
+            {:fn (fn [ball-on]
+                   {:path [:ball-on]
+                    :number ball-on
+                    :dom-id "ball-on"
+                    :dom-label "ball on"
+                    :max 50
+                    :display-fn #(if (zero? %) "G" %)})}))
+
+(defn to-go-editor [to-go]
+  (om/build number-editor to-go
+            {:fn (fn [to-go]
+                   {:path [:to-go]
+                    :number to-go
+                    :dom-id "to-go"
+                    :dom-label "to go"
+                    :max 100
+                    :display-fn #(if (zero? %) "in." %)})}))
+
+(defn down-editor [down]
+  (om/build number-editor down
+            {:fn (fn [down]
+                   {:path [:down]
+                    :number down
+                    :dom-id "down"
+                    :dom-label "down"
+                    :max 4
+                    :min 1})}))
+
+(defn qtr-editor [qtr]
+  (om/build number-editor qtr
+            {:fn (fn [qtr]
+                   {:path [:qtr]
+                    :number qtr
+                    :dom-id "qtr"
+                    :dom-label "qtr"
+                    :max 4
+                    :min 1})}))
 
 (defn scoreboard [app owner]
   (reify
@@ -128,20 +159,12 @@
                     {:fn #(assoc %
                             :posession (= :away (:posession app)))})]]
         [:div.bottom
-         [:div.down.left
-          [:div "down"]
-          [:div.click {:on-click (publish-event! ::inc-down)}
-           (:down app)]]
-         [:div.togo.left
-          [:div "to go"]
-          [:div.click {:on-click (publish-event! ::inc-to-go)
-                 :on-context-menu (publish-event! ::dec-to-go)}
-           (if (zero? (:to-go app)) "in." (:to-go app))]]
+         [:div.left
+          (down-editor (:down app))]
+         [:div.left (to-go-editor (:to-go app))]
          [:div.left (ball-on-editor (:ball-on app))]
-         [:div.quarter.left
-          [:div "qtr"]
-          [:div.click {:on-click (publish-event! ::inc-qtr)}
-           (:qtr app)]]]]))))
+         [:div.left
+          (qtr-editor (:qtr app))]]]))))
 
 (defn main []
   (om/root
@@ -192,7 +215,8 @@
   (swap! app-state update-in path #(between max min (dec (int %)))))
 
 (defn update-number [{:keys [path number max min editor]}]
-  (swap! app-state update-in path (fn [_] (between max min (int number))))
+  (if-not (blank? number)
+    (swap! app-state update-in path (fn [_] (between max min (int number)))))
   (om/set-state! editor [:editing?] false))
 
 (defonce subscriptions
@@ -201,10 +225,6 @@
    [::dec-score] dec-score
    [::dec-timeout] dec-timeout
    [::change-posession] change-posession
-   [::inc-qtr] inc-qtr
-   [::inc-down] inc-down
-   [::inc-to-go] inc-to-go
-   [::dec-to-go] dec-to-go
    [::edit-number] edit-number
    [::inc-number] inc-number
    [::dec-number] dec-number
