@@ -1,5 +1,5 @@
 (ns scoreboard.events
-  (:require [cljs.core.async :refer [chan <!] :as a])
+  (:require [cljs.core.async :refer [chan <! close!] :as a])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defonce app-state (atom {}))
@@ -69,3 +69,8 @@
 (defn subscriptions [& pairs]
   (doseq [[evts handler] (partition 2 pairs)]
         (bind evts handler)))
+
+(defn timeout [ms]
+  (let [c (chan)]
+    (js/setTimeout (fn [] (close! c)) ms)
+    c))

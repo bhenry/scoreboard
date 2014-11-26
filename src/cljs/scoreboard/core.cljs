@@ -48,10 +48,10 @@
                         (e/publish!
                          (e/event ::update-number
                                   (merge event-info
-                                         {:number (.-value
+                                         {:callback #(om/set-state! owner [:editing?] false)
+                                          :number (.-value
                                                    (. js/document
-                                                      (getElementById dom-id)))
-                                          :editor owner}))))]
+                                                      (getElementById dom-id)))}))))]
         (html
          [:div {:class dom-id}
           (when dom-label
@@ -106,18 +106,17 @@
      <> (str "< " ydln " >"))))
 
 (defn ball-on-editor [ball-on possession]
-  (om/build number-editor ball-on
-            {:fn (fn [ball-on]
-                   {:path [:ball-on]
-                    :number ball-on
-                    :dom-id "ball-on"
-                    :dom-label "ball on"
-                    :label-tip i/ball-on-label
-                    :number-tip i/ball-on-number
-                    :click-dec? (= possession :away)
-                    :max 100
-                    :min 0
-                    :display-fn show-ball-on})}))
+  (om/build number-editor
+            {:path [:ball-on]
+             :number ball-on
+             :dom-id "ball-on"
+             :dom-label "ball on"
+             :label-tip i/ball-on-label
+             :number-tip i/ball-on-number
+             :click-dec? (= possession :away)
+             :max 100
+             :min 0
+             :display-fn show-ball-on}))
 
 (defn to-go-editor [to-go]
   (om/build number-editor to-go
@@ -128,6 +127,7 @@
                     :dom-label "to go"
                     :label-tip i/to-go-label
                     :number-tip i/to-go-number
+                    :click-dec? true
                     :max 100
                     :display-fn #(if (zero? %) "in." %)})}))
 
@@ -233,10 +233,10 @@
 (defn dec-number [{:keys [path max min]}]
   (swap! app-state update-in path #(between max min (dec (int %)))))
 
-(defn update-number [{:keys [path number max min editor]}]
+(defn update-number [{:keys [path number max min callback]}]
   (if-not (blank? number)
     (swap! app-state update-in path (fn [_] (between max min (int number)))))
-  (om/set-state! editor [:editing?] false))
+  (when callback (callback)))
 
 (defonce subscriptions
   (e/subscriptions

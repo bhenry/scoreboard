@@ -1,5 +1,6 @@
 (ns scoreboard.dev
   (:require [scoreboard.core :as core]
+            [scoreboard.test :as test]
             [figwheel.client :as figwheel :include-macros true]
             [cljs.core.async :refer [put!]]
             [weasel.repl :as weasel]))
@@ -13,3 +14,4 @@
 (weasel/connect "ws://localhost:9001" :verbose true)
 
 (core/main)
+(test/main)

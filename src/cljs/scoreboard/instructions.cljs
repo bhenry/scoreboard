@@ -33,8 +33,8 @@
       "Leave the box empty to cancel."))
 
 (def to-go-label
-  (tt "Click to add 1 yard to go."
-      "Right click to remove 1 yard to go."))
+  (tt "Click to advance the offense 1 yard."
+      "Right click for a loss of 1 yard."))
 
 (def to-go-number
   (tt "Click to edit yards to go."
