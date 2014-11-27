@@ -1,5 +1,5 @@
 # scoreboard
-https://evening-taiga-7916.herokuapp.com/
+https://benchwarmer.herokuapp.com/
 
 ## Development
 
