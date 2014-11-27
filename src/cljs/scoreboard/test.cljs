@@ -28,9 +28,19 @@
   (concat [(e/event ::s/change-possession)]
           (update-number-events)))
 
+(defonce benchmarks (atom []))
+
+(defn add-benchmark [benchmarks]
+  (cons (. (js/Date.) (getTime)) (take 999 benchmarks)))
+
 (defn publish-random-event []
+  (swap! benchmarks add-benchmark)
   (publish! (rand-nth (event-bag))))
 
 (defn main []
-  (.setInterval js/window publish-random-event 1))
+  (.setInterval js/window publish-random-event 10))
 
+(defn bench [& [n]]
+  (let [latest-n (take (or 1000 n) @benchmarks)]
+    (/ (- (first latest-n) (last latest-n))
+       (count latest-n))))
